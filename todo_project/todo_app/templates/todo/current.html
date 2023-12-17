@@ -1,1 +1,24 @@
-{% extends 'todo/base.html' %} {% block content %} {{user.username}} {% endblock %}
+{% extends 'todo/base.html' %} 
+{% block content %} 
+<style>
+    .important {
+        color: red;
+    }
+    .todo-item h2, .todo-item p {
+            display: inline-block;
+            margin-right: 10px;
+    }
+</style>
+
+    <h1>{{user.username}}'s Todos</h1>
+    {% for todo in todos %}
+    <div class="todo-item">
+    <h2 class="{% if todo.is_important %}important{% endif %}">{{ todo.title }}</h2>
+    <p>{{ todo.created }}</p>
+    <p>
+        Completed: 
+        <input type="checkbox" name="completed" value="{{ todo.id }}" {% if todo.is_completed %}checked{% endif %}>
+    </p>
+    </div>
+    {% endfor %}
+{% endblock %}

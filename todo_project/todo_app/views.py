@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import login,logout,authenticate
+from .forms import TodoForm
+from .models import Todo
 # Create your views here.
 def signupuser(request):
     if request.method == 'GET':
@@ -22,7 +24,21 @@ def signupuser(request):
             return render(request, 'todo/signup.html', {'form':UserCreationForm(),'error':'Passwords did not match'})
 
 def currenttodos(request):
-    return render(request, 'todo/current.html')
+    todos = Todo.objects.filter(owner=request.user)
+    return render(request, 'todo/current.html',{'todos':todos})
+
+def createtodos(request):
+    if request.method == 'GET':
+        return render(request, 'todo/create.html', {'form':TodoForm()})
+    else:
+        try:
+            form = TodoForm(request.POST)
+            new_todo = form.save(commit=False)
+            new_todo.owner = request.user
+            new_todo.save()
+            return redirect('currenttodos')
+        except ValueError:
+            return render(request, 'todo/create.html', {'form':TodoForm(),'error':'Bad Data'})
 
 def logoutuser(request):
     if request.method == 'POST':
